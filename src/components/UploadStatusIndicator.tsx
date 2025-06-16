@@ -12,16 +12,36 @@ export function UploadStatusIndicator() {
     const checkHealth = async () => {
       setIsChecking(true);
       try {
-        const healthy = await checkServerHealth();
-        setIsServerHealthy(healthy);
+        // Check if we're in a hosted environment with localhost backend
+        const isHostedEnvironment =
+          !window.location.hostname.includes("localhost") &&
+          !window.location.hostname.includes("127.0.0.1") &&
+          !window.location.hostname.includes("0.0.0.0");
+
+        const API_BASE_URL =
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+        const shouldSkipCheck =
+          isHostedEnvironment && API_BASE_URL.includes("localhost");
+
+        if (shouldSkipCheck) {
+          // Skip health check in hosted environments
+          setIsServerHealthy(false);
+        } else {
+          const healthy = await checkServerHealth();
+          setIsServerHealthy(healthy);
+        }
       } catch (error) {
+        console.warn("Health check failed:", error);
         setIsServerHealthy(false);
       } finally {
         setIsChecking(false);
       }
     };
 
-    checkHealth();
+    // Add a small delay to prevent immediate fetch on component mount
+    const timeoutId = setTimeout(checkHealth, 100);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   if (isChecking) {
@@ -45,6 +65,9 @@ export function UploadStatusIndicator() {
     );
   }
 
+  // Check if we're in a hosted environment
+  const isHostedEnvironment = !window.location.hostname.includes("localhost");
+
   return (
     <div className="space-y-2">
       <Badge variant="secondary" className="gap-1">
@@ -55,10 +78,20 @@ export function UploadStatusIndicator() {
         <WifiOff className="h-4 w-4" />
         <AlertDescription className="text-sm">
           <strong>Demo Mode:</strong> Files are simulated and won't be stored.
-          To enable Google Drive uploads, start the backend server with{" "}
-          <code className="text-xs bg-muted px-1 py-0.5 rounded">
-            node start-backend.js
-          </code>
+          {isHostedEnvironment ? (
+            <span>
+              {" "}
+              This demo shows the UI and functionality with mock data.
+            </span>
+          ) : (
+            <span>
+              {" "}
+              To enable Google Drive uploads, start the backend server with{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                node start-backend.js
+              </code>
+            </span>
+          )}
         </AlertDescription>
       </Alert>
     </div>

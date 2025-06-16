@@ -88,19 +88,40 @@ export const uploadMediaFileToGoogleDrive = async (
 
 // Health check function to verify backend is running
 export const checkServerHealth = async (): Promise<boolean> => {
+  // Skip health check in hosted environments where localhost won't work
+  const isHostedEnvironment =
+    !window.location.hostname.includes("localhost") &&
+    !window.location.hostname.includes("127.0.0.1") &&
+    !window.location.hostname.includes("0.0.0.0");
+
+  if (isHostedEnvironment && API_BASE_URL.includes("localhost")) {
+    console.log("Hosted environment detected, skipping localhost health check");
+    return false;
+  }
+
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
 
     const response = await fetch(`${API_BASE_URL}/health`, {
       method: "GET",
       signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     clearTimeout(timeoutId);
     return response.ok;
   } catch (error) {
-    console.log("Backend server not available, will use mock uploads");
+    // Silently handle errors in hosted environments
+    if (isHostedEnvironment) {
+      console.log(
+        "Backend not available in hosted environment, using mock uploads",
+      );
+    } else {
+      console.log("Backend server not available, will use mock uploads");
+    }
     return false;
   }
 };
@@ -109,45 +130,34 @@ export const checkServerHealth = async (): Promise<boolean> => {
 export const uploadMediaFileWithFallback = async (
   file: File,
 ): Promise<MediaFile> => {
-  // First check if we should even try the real API
-  // In development/demo mode, we might want to skip this check entirely
-  const isDemoMode =
-    !API_BASE_URL.includes("localhost") ||
-    window.location.hostname !== "localhost";
+  // Check if we're in a hosted environment
+  const isHostedEnvironment =
+    !window.location.hostname.includes("localhost") &&
+    !window.location.hostname.includes("127.0.0.1") &&
+    !window.location.hostname.includes("0.0.0.0");
 
-  let shouldTryRealAPI = true;
+  // Skip real API attempts in hosted environments with localhost URLs
+  const shouldSkipRealAPI =
+    isHostedEnvironment && API_BASE_URL.includes("localhost");
 
-  // In demo/hosted environments, quickly check if backend is available
-  if (isDemoMode) {
-    try {
-      // Quick health check with very short timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout
-
-      const response = await fetch(`${API_BASE_URL}/health`, {
-        method: "GET",
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-      shouldTryRealAPI = response.ok;
-    } catch {
-      shouldTryRealAPI = false;
-    }
+  if (shouldSkipRealAPI) {
+    console.log(
+      "Using mock upload (hosted environment, localhost backend not accessible)",
+    );
+    const { uploadMediaFile } = await import("./mockData");
+    return uploadMediaFile(file);
   }
 
-  // Try real upload if backend is available
-  if (shouldTryRealAPI) {
-    try {
-      console.log("Attempting Google Drive upload...");
-      return await uploadMediaFileToGoogleDrive(file);
-    } catch (error) {
-      console.warn("Google Drive upload failed, falling back to mock:", error);
-    }
-  }
+  // Try real upload if we're in development or have a proper backend URL
+  try {
+    console.log("Attempting Google Drive upload...");
+    return await uploadMediaFileToGoogleDrive(file);
+  } catch (error) {
+    console.warn("Google Drive upload failed, falling back to mock:", error);
 
-  // Fallback to mock upload
-  console.log("Using mock upload (backend not available or demo mode)");
-  const { uploadMediaFile } = await import("./mockData");
-  return uploadMediaFile(file);
+    // Fallback to mock upload
+    console.log("Using mock upload as fallback");
+    const { uploadMediaFile } = await import("./mockData");
+    return uploadMediaFile(file);
+  }
 };
