@@ -20,6 +20,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Issue, IssueType, Priority, MediaFile } from "@/lib/types";
 import { generateId, currentUser } from "@/lib/mockData";
 import { uploadMediaFileWithFallback } from "@/lib/googleDriveUpload";
+import { UploadStatusIndicator } from "./UploadStatusIndicator";
 import { cn } from "@/lib/utils";
 
 interface IssueFormData {
@@ -452,7 +453,10 @@ export default function IssueSubmissionForm({
 
           {/* Media Upload */}
           <div className="space-y-4">
-            <Label>Attachments</Label>
+            <div className="flex items-center justify-between">
+              <Label>Attachments</Label>
+              <UploadStatusIndicator />
+            </div>
             <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
               <div className="text-center">
                 <Upload className="mx-auto h-12 w-12 text-muted-foreground/50" />
