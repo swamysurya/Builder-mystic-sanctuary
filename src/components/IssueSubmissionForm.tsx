@@ -18,7 +18,8 @@ import { Progress } from "@/components/ui/progress";
 import { AlertCircle, Upload, X, FileText, Image, Video } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Issue, IssueType, Priority, MediaFile } from "@/lib/types";
-import { generateId, uploadMediaFile, currentUser } from "@/lib/mockData";
+import { generateId, currentUser } from "@/lib/mockData";
+import { uploadMediaFileWithFallback } from "@/lib/googleDriveUpload";
 import { cn } from "@/lib/utils";
 
 interface IssueFormData {
@@ -92,7 +93,7 @@ export default function IssueSubmissionForm({
           });
         }, 200);
 
-        const uploadedFile = await uploadMediaFile(file);
+        const uploadedFile = await uploadMediaFileWithFallback(file);
 
         clearInterval(progressInterval);
         setUploadProgress((prev) => ({ ...prev, [fileId]: 100 }));

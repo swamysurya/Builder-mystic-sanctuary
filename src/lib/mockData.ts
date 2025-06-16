@@ -230,7 +230,7 @@ export const loadFromLocalStorage = <T>(key: string, defaultValue: T): T => {
   return defaultValue;
 };
 
-// API simulation for media upload
+// Mock API simulation for media upload (fallback)
 export const uploadMediaFile = async (file: File): Promise<MediaFile> => {
   // Simulate API call delay
   await new Promise((resolve) =>
