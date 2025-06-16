@@ -104,13 +104,32 @@ export default function IssueSubmissionForm({
             const { [fileId]: _, ...rest } = prev;
             return rest;
           });
+
+          // Show a subtle indicator if using mock upload
+          if (
+            uploadedFile.url.includes("mock") ||
+            uploadedFile.url.includes(generateId())
+          ) {
+            console.log(
+              "📁 File uploaded successfully (demo mode - using mock storage)",
+            );
+          } else {
+            console.log("☁️ File uploaded to Google Drive successfully");
+          }
         }, 500);
       } catch (error) {
         console.error("Upload failed:", error);
+
+        // Clear progress and show error
         setUploadProgress((prev) => {
           const { [fileId]: _, ...rest } = prev;
           return rest;
         });
+
+        // You could add toast notification here if available
+        alert(
+          `Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
       }
     }
   };
