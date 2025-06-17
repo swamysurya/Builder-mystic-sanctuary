@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 4001;
 
 // Middleware
 app.use(cors());
@@ -62,6 +62,10 @@ const initializeDrive = () => {
   try {
     // Option 1: Using service account key file (recommended for production)
     if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH) {
+      // console.log(
+      //   "🔑 Using service account key file for authentication",
+      //   process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH,
+      // );
       const serviceAccountKey = JSON.parse(
         fs.readFileSync(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH, "utf8"),
       );
@@ -70,7 +74,7 @@ const initializeDrive = () => {
         credentials: serviceAccountKey,
         scopes: SCOPES,
       });
-
+      // console.log("✅ Google Drive API initialized with service account");
       return google.drive({ version: "v3", auth });
     }
 
@@ -84,7 +88,6 @@ const initializeDrive = () => {
         },
         scopes: SCOPES,
       });
-
       return google.drive({ version: "v3", auth });
     }
 
@@ -136,7 +139,7 @@ const uploadToGoogleDrive = async (filePath, fileName, mimeType) => {
 
     // Generate shareable link
     const shareableLink = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
-
+    console.log("🚀 File uploaded to Google Drive:", shareableLink);
     return shareableLink;
   } catch (error) {
     console.error("Error uploading to Google Drive:", error);
@@ -255,7 +258,7 @@ app.use((error, req, res, next) => {
 if (!fs.existsSync("uploads")) {
   fs.mkdirSync("uploads");
 }
-
+console.log(PORT);
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📁 Upload endpoint: http://localhost:${PORT}/upload-media`);
