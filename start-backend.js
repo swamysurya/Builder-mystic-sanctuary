@@ -15,10 +15,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 console.log("🚀 Starting Issue Tracker Backend Server...");
-console.log(
-  "📝 Make sure you have configured Google Drive credentials in .env",
-);
-console.log("📖 See GOOGLE_DRIVE_SETUP.md for setup instructions");
+console.log("📝 Make sure you have configured Cloudinary credentials in .env");
+console.log("📖 See CLOUDINARY_SETUP.md for setup instructions");
 console.log("");
 
 const serverPath = join(__dirname, "server", "index.js");

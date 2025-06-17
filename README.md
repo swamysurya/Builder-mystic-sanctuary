@@ -6,7 +6,7 @@ A modern, full-featured issue tracking application with Google Drive integration
 
 - **📝 Issue Management**: Submit, track, and manage issues across different categories
 - **💬 Real-time Chat**: Communicate about issues with team members
-- **☁️ Google Drive Integration**: Upload files directly to Google Drive with shareable links
+- **☁️ Cloudinary Integration**: Upload files directly to Cloudinary with optimized delivery
 - **🏷️ Smart Filtering**: Filter issues by status, type, priority, and more
 - **📱 Responsive Design**: Works beautifully on desktop, tablet, and mobile
 - **🎨 Modern UI**: Beautiful, accessible design with dark mode support
@@ -23,12 +23,12 @@ npm run dev:client
 
 The app will run in demo mode with mock file uploads.
 
-### Full Setup with Google Drive
+### Full Setup with Cloudinary
 
 ```bash
 npm install
 
-# 1. Set up Google Drive API (see GOOGLE_DRIVE_SETUP.md)
+# 1. Set up Cloudinary account (see CLOUDINARY_SETUP.md)
 # 2. Configure your .env file with credentials
 # 3. Start both frontend and backend
 
@@ -42,7 +42,7 @@ npm run dev:client
 ## 📁 Project Structure
 
 ```
-├── src/
+├─��� src/
 │   ├── components/           # React components
 │   │   ├── ui/              # shadcn/ui components
 │   │   ├── IssueSubmissionForm.tsx
@@ -72,24 +72,23 @@ Copy `.env.example` to `.env` and configure:
 # Server Configuration
 PORT=3001
 
-# Google Drive API (see GOOGLE_DRIVE_SETUP.md)
-GOOGLE_SERVICE_ACCOUNT_KEY_PATH=./service-account-key.json
-
-# Optional: Upload to specific folder
-GOOGLE_DRIVE_FOLDER_ID=your-folder-id
+# Cloudinary Configuration (see CLOUDINARY_SETUP.md)
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
 
 # Frontend API URL
 VITE_API_BASE_URL=http://localhost:3001
 ```
 
-### Google Drive Setup
+### Cloudinary Setup
 
-See [GOOGLE_DRIVE_SETUP.md](./GOOGLE_DRIVE_SETUP.md) for complete instructions on:
+See [CLOUDINARY_SETUP.md](./CLOUDINARY_SETUP.md) for complete instructions on:
 
-- Creating a Google Cloud project
-- Enabling Google Drive API
-- Setting up service account authentication
-- Configuring file permissions
+- Creating a Cloudinary account
+- Getting your API credentials
+- Configuring environment variables
+- Testing the integration
 
 ## 🎮 Usage
 
@@ -123,16 +122,16 @@ The application supports uploading:
 
 ### Upload Modes
 
-**🟢 Google Drive Mode** (when backend is running)
+**🟢 Cloudinary Mode** (when backend is running)
 
-- Files uploaded to Google Drive
-- Shareable public links generated
-- Permanent storage
+- Files uploaded to Cloudinary
+- Optimized CDN delivery URLs generated
+- Permanent cloud storage
 
 **🔵 Demo Mode** (backend not available)
 
 - Mock file uploads for testing
-- Simulated Google Drive links
+- Simulated Cloudinary URLs
 - Data stored locally
 
 ## 🛠️ Development
@@ -167,7 +166,7 @@ The frontend automatically detects backend availability:
 
 ```typescript
 // Real upload (when backend available)
-const file = await uploadMediaFileToGoogleDrive(file);
+const file = await uploadMediaFileToCloudinary(file);
 
 // Automatic fallback to mock
 const file = await uploadMediaFileWithFallback(file);
@@ -175,13 +174,13 @@ const file = await uploadMediaFileWithFallback(file);
 
 ## 🔒 Security
 
-- Service account authentication for Google Drive
+- API key authentication for Cloudinary
 - File type and size validation
 - CORS protection
 - No sensitive data in frontend
-- Automatic public link generation
+- Secure CDN delivery URLs
 
-## �� Troubleshooting
+## 🚧 Troubleshooting
 
 ### Common Issues
 
@@ -191,11 +190,11 @@ const file = await uploadMediaFileWithFallback(file);
 - Check console for server status
 - App will automatically fall back to demo mode
 
-**Google Drive upload failures**
+**Cloudinary upload failures**
 
-- Verify service account credentials
-- Check Google Drive API is enabled
-- Ensure proper folder permissions
+- Verify API credentials in .env file
+- Check Cloudinary account status
+- Ensure usage limits aren't exceeded
 
 **File upload limits**
 
@@ -216,7 +215,7 @@ Check upload status:
 - **Frontend**: React 18, TypeScript, Vite
 - **UI**: shadcn/ui, Tailwind CSS, Radix UI
 - **Backend**: Node.js, Express
-- **File Upload**: Multer, Google Drive API
+- **File Upload**: Multer, Cloudinary
 - **State**: React Hook Form, Local Storage
 - **Icons**: Lucide React
 - **Date**: date-fns
