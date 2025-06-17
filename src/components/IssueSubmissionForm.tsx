@@ -115,7 +115,7 @@ export default function IssueSubmissionForm({
               "📁 File uploaded successfully (demo mode - using mock storage)",
             );
           } else {
-            console.log("☁️ File uploaded to Google Drive successfully");
+            console.log("☁️ File uploaded to Cloudinary successfully");
           }
         }, 500);
       } catch (error) {

@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import cors from "cors";
-import { google } from "googleapis";
+import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -54,92 +54,49 @@ const upload = multer({
   },
 });
 
-// Google Drive API setup
-const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
-
-// Initialize Google Drive API
-const initializeDrive = () => {
+// Cloudinary configuration
+const initializeCloudinary = () => {
   try {
-    // Option 1: Using service account key file (recommended for production)
-    if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH) {
-      const serviceAccountKey = JSON.parse(
-        fs.readFileSync(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH, "utf8"),
-      );
-
-      const auth = new google.auth.GoogleAuth({
-        credentials: serviceAccountKey,
-        scopes: SCOPES,
-      });
-
-      return google.drive({ version: "v3", auth });
+    if (
+      !process.env.CLOUDINARY_CLOUD_NAME ||
+      !process.env.CLOUDINARY_API_KEY ||
+      !process.env.CLOUDINARY_API_SECRET
+    ) {
+      throw new Error("Cloudinary credentials not configured properly");
     }
 
-    // Option 2: Using environment variables (good for development)
-    if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
-      const auth = new google.auth.GoogleAuth({
-        credentials: {
-          client_email: process.env.GOOGLE_CLIENT_EMAIL,
-          private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-          client_id: process.env.GOOGLE_CLIENT_ID,
-        },
-        scopes: SCOPES,
-      });
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
 
-      return google.drive({ version: "v3", auth });
-    }
-
-    throw new Error("Google Drive credentials not configured properly");
+    return true;
   } catch (error) {
-    console.error("Failed to initialize Google Drive:", error.message);
-    return null;
+    console.error("Failed to initialize Cloudinary:", error.message);
+    return false;
   }
 };
 
-const drive = initializeDrive();
+const isCloudinaryInitialized = initializeCloudinary();
 
-// Upload file to Google Drive
-const uploadToGoogleDrive = async (filePath, fileName, mimeType) => {
-  if (!drive) {
-    throw new Error("Google Drive not initialized");
+// Upload file to Cloudinary
+const uploadToCloudinary = async (filePath, fileName, mimeType) => {
+  if (!isCloudinaryInitialized) {
+    throw new Error("Cloudinary not initialized");
   }
 
   try {
-    const fileMetadata = {
-      name: fileName,
-      parents: process.env.GOOGLE_DRIVE_FOLDER_ID
-        ? [process.env.GOOGLE_DRIVE_FOLDER_ID]
-        : undefined,
-    };
-
-    const media = {
-      mimeType: mimeType,
-      body: fs.createReadStream(filePath),
-    };
-
-    // Upload file
-    const response = await drive.files.create({
-      resource: fileMetadata,
-      media: media,
-      fields: "id",
+    const uploadResult = await cloudinary.uploader.upload(filePath, {
+      resource_type: "auto", // Automatically detect file type
+      public_id: fileName.split(".")[0], // Use filename without extension as public_id
+      use_filename: true,
+      unique_filename: true,
     });
 
-    const fileId = response.data.id;
-
-    // Set file permissions to be publicly viewable
-    await drive.permissions.create({
-      fileId: fileId,
-      resource: {
-        role: "reader",
-        type: "anyone",
-      },
-    });
-
-    // Generate shareable link
-    const shareableLink = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
-
-    return shareableLink;
+    return uploadResult.secure_url;
   } catch (error) {
-    console.error("Error uploading to Google Drive:", error);
+    console.error("Error uploading to Cloudinary:", error);
     throw error;
   }
 };
@@ -149,7 +106,7 @@ app.get("/health", (req, res) => {
   res.json({
     status: "OK",
     timestamp: new Date().toISOString(),
-    googleDriveInitialized: !!drive,
+    cloudinaryInitialized: isCloudinaryInitialized,
   });
 });
 
@@ -163,10 +120,10 @@ app.post("/upload-media", upload.single("file"), async (req, res) => {
       });
     }
 
-    if (!drive) {
+    if (!isCloudinaryInitialized) {
       return res.status(500).json({
         success: false,
-        error: "Google Drive not configured. Please check your credentials.",
+        error: "Cloudinary not configured. Please check your credentials.",
       });
     }
 
@@ -176,8 +133,8 @@ app.post("/upload-media", upload.single("file"), async (req, res) => {
       `Uploading file: ${originalname} (${(size / 1024 / 1024).toFixed(2)} MB)`,
     );
 
-    // Upload to Google Drive
-    const mediaLink = await uploadToGoogleDrive(
+    // Upload to Cloudinary
+    const mediaLink = await uploadToCloudinary(
       tempPath,
       originalname,
       mimetype,
@@ -214,7 +171,7 @@ app.post("/upload-media", upload.single("file"), async (req, res) => {
     ) {
       res.status(500).json({
         success: false,
-        error: "Google Drive configuration error. Please check server setup.",
+        error: "Cloudinary configuration error. Please check server setup.",
       });
     } else if (
       error.message.includes("quota") ||
@@ -261,11 +218,11 @@ app.listen(PORT, () => {
   console.log(`📁 Upload endpoint: http://localhost:${PORT}/upload-media`);
   console.log(`🏥 Health check: http://localhost:${PORT}/health`);
 
-  if (!drive) {
+  if (!isCloudinaryInitialized) {
     console.log(
-      "⚠️  Google Drive not initialized. Please configure credentials.",
+      "⚠️  Cloudinary not initialized. Please configure credentials.",
     );
   } else {
-    console.log("✅ Google Drive initialized successfully");
+    console.log("✅ Cloudinary initialized successfully");
   }
 });

@@ -14,7 +14,7 @@ export interface UploadResponse {
   error?: string;
 }
 
-export const uploadMediaFileToGoogleDrive = async (
+export const uploadMediaFileToCloudinary = async (
   file: File,
 ): Promise<MediaFile> => {
   // Create FormData for file upload
@@ -56,7 +56,7 @@ export const uploadMediaFileToGoogleDrive = async (
       uploadedAt: new Date(),
     };
   } catch (error) {
-    console.error("Google Drive upload error:", error);
+    console.error("Cloudinary upload error:", error);
 
     // Provide user-friendly error messages
     if (error instanceof Error) {
@@ -150,10 +150,10 @@ export const uploadMediaFileWithFallback = async (
 
   // Try real upload if we're in development or have a proper backend URL
   try {
-    console.log("Attempting Google Drive upload...");
-    return await uploadMediaFileToGoogleDrive(file);
+    console.log("Attempting Cloudinary upload...");
+    return await uploadMediaFileToCloudinary(file);
   } catch (error) {
-    console.warn("Google Drive upload failed, falling back to mock:", error);
+    console.warn("Cloudinary upload failed, falling back to mock:", error);
 
     // Fallback to mock upload
     console.log("Using mock upload as fallback");

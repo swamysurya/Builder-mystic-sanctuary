@@ -60,7 +60,7 @@ export function UploadStatusIndicator() {
         className="gap-1 bg-green-500 hover:bg-green-600"
       >
         <Cloud className="h-3 w-3" />
-        Google Drive Active
+        Cloudinary Active
       </Badge>
     );
   }
@@ -86,7 +86,7 @@ export function UploadStatusIndicator() {
           ) : (
             <span>
               {" "}
-              To enable Google Drive uploads, start the backend server with{" "}
+              To enable Cloudinary uploads, start the backend server with{" "}
               <code className="text-xs bg-muted px-1 py-0.5 rounded">
                 node start-backend.js
               </code>
