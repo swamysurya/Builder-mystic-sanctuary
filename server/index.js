@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 4001;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -57,7 +57,6 @@ const upload = multer({
 // Cloudinary configuration
 const initializeCloudinary = () => {
   try {
-<<<<<<< HEAD
     if (
       !process.env.CLOUDINARY_CLOUD_NAME ||
       !process.env.CLOUDINARY_API_KEY ||
@@ -73,40 +72,6 @@ const initializeCloudinary = () => {
     });
 
     return true;
-=======
-    // Option 1: Using service account key file (recommended for production)
-    if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH) {
-      // console.log(
-      //   "🔑 Using service account key file for authentication",
-      //   process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH,
-      // );
-      const serviceAccountKey = JSON.parse(
-        fs.readFileSync(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH, "utf8"),
-      );
-
-      const auth = new google.auth.GoogleAuth({
-        credentials: serviceAccountKey,
-        scopes: SCOPES,
-      });
-      // console.log("✅ Google Drive API initialized with service account");
-      return google.drive({ version: "v3", auth });
-    }
-
-    // Option 2: Using environment variables (good for development)
-    if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
-      const auth = new google.auth.GoogleAuth({
-        credentials: {
-          client_email: process.env.GOOGLE_CLIENT_EMAIL,
-          private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-          client_id: process.env.GOOGLE_CLIENT_ID,
-        },
-        scopes: SCOPES,
-      });
-      return google.drive({ version: "v3", auth });
-    }
-
-    throw new Error("Google Drive credentials not configured properly");
->>>>>>> 92291fb4f6685bb2c60fe52d62e3b84fa426538d
   } catch (error) {
     console.error("Failed to initialize Cloudinary:", error.message);
     return false;
@@ -129,25 +94,7 @@ const uploadToCloudinary = async (filePath, fileName, mimeType) => {
       unique_filename: true,
     });
 
-<<<<<<< HEAD
     return uploadResult.secure_url;
-=======
-    const fileId = response.data.id;
-
-    // Set file permissions to be publicly viewable
-    await drive.permissions.create({
-      fileId: fileId,
-      resource: {
-        role: "reader",
-        type: "anyone",
-      },
-    });
-
-    // Generate shareable link
-    const shareableLink = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
-    console.log("🚀 File uploaded to Google Drive:", shareableLink);
-    return shareableLink;
->>>>>>> 92291fb4f6685bb2c60fe52d62e3b84fa426538d
   } catch (error) {
     console.error("Error uploading to Cloudinary:", error);
     throw error;
@@ -265,7 +212,7 @@ app.use((error, req, res, next) => {
 if (!fs.existsSync("uploads")) {
   fs.mkdirSync("uploads");
 }
-console.log(PORT);
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📁 Upload endpoint: http://localhost:${PORT}/upload-media`);
