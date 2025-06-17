@@ -1,6 +1,6 @@
 # 🎯 Issue Tracker Application
 
-A modern, full-featured issue tracking application with Google Drive integration for file uploads.
+A modern, full-featured issue tracking application with Cloudinary integration for file uploads.
 
 ## ✨ Features
 
@@ -52,13 +52,13 @@ npm run dev:client
 │   ├── lib/                 # Utilities and types
 │   │   ├── types.ts         # TypeScript type definitions
 │   │   ├── mockData.ts      # Mock data generators
-│   │   └── googleDriveUpload.ts # Google Drive integration
+│   │   └── cloudinaryUpload.ts # Cloudinary integration
 │   └── pages/               # Route components
 │       └── Index.tsx        # Main application
 ├── server/
 │   └── index.js            # Express backend server
 ├── .env.example            # Environment variables template
-├── GOOGLE_DRIVE_SETUP.md   # Google Drive setup guide
+├── CLOUDINARY_SETUP.md     # Cloudinary setup guide
 └── start-backend.js        # Backend startup script
 ```
 
@@ -200,7 +200,7 @@ const file = await uploadMediaFileWithFallback(file);
 
 - Maximum 50MB per file
 - Check supported file types
-- Verify Google Drive quota
+- Verify Cloudinary usage limits
 
 ### Debug Mode
 

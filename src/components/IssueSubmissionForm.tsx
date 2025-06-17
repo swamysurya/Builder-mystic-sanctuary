@@ -19,7 +19,7 @@ import { AlertCircle, Upload, X, FileText, Image, Video } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Issue, IssueType, Priority, MediaFile } from "@/lib/types";
 import { generateId, currentUser } from "@/lib/mockData";
-import { uploadMediaFileWithFallback } from "@/lib/googleDriveUpload";
+import { uploadMediaFileWithFallback } from "@/lib/cloudinaryUpload";
 import { UploadStatusIndicator } from "./UploadStatusIndicator";
 import { cn } from "@/lib/utils";
 

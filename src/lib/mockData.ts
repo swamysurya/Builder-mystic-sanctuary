@@ -237,13 +237,13 @@ export const uploadMediaFile = async (file: File): Promise<MediaFile> => {
     setTimeout(resolve, 1500 + Math.random() * 1000),
   );
 
-  // Simulate Google Drive response
-  const mockDriveLink = `https://drive.google.com/file/d/${generateId()}/view?usp=sharing`;
+  // Simulate Cloudinary response
+  const mockCloudinaryLink = `https://res.cloudinary.com/demo/image/upload/v${Date.now()}/sample-${generateId()}.jpg`;
 
   return {
     id: generateId(),
     name: file.name,
-    url: mockDriveLink,
+    url: mockCloudinaryLink,
     type: file.type,
     size: file.size,
     uploadedAt: new Date(),

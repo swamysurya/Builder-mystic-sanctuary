@@ -2,7 +2,7 @@
 
 /**
  * Simple script to start the backend server
- * Run this separately if you want to use real Google Drive uploads
+ * Run this separately if you want to use real Cloudinary uploads
  *
  * Usage: node start-backend.js
  */

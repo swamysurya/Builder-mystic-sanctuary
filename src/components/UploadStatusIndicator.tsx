@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Cloud, HardDrive, Wifi, WifiOff } from "lucide-react";
-import { checkServerHealth } from "@/lib/googleDriveUpload";
+import { checkServerHealth } from "@/lib/cloudinaryUpload";
 
 export function UploadStatusIndicator() {
   const [isServerHealthy, setIsServerHealthy] = useState<boolean | null>(null);
