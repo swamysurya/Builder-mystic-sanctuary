@@ -50,7 +50,6 @@
     "dotenv": "^16.4.7",
     "embla-carousel-react": "^8.3.0",
     "express": "^5.0.2",
-    "framer-motion": "^12.6.2",
     "cloudinary": "^2.6.0",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.462.0",
